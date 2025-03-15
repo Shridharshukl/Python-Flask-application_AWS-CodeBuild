@@ -1,0 +1,39 @@
+version: 0.2
+
+env:
+  parameter-store:
+    DOCKER_USER: /App/Dockeruser
+    DOCKER_PASS: /App/Dockerpass
+
+  variables:
+    DOCKER_URL: docker.io  
+    
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing dependencies..."
+      - pip install -r simple-python-app/requirements.txt
+
+  pre_build:
+    commands:
+      - echo "Logging in to Docker Hub..."
+      - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin $DOCKER_URL
+      - echo "Logged in to Docker Hub"
+
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - cd simple-python-app/  
+      - docker build -t "$DOCKER_URL/$DOCKER_USER/simple-python-flask-app:latest" .
+      - docker push "$DOCKER_URL/$DOCKER_USER/simple-python-flask-app:latest"
+
+  post_build:
+    commands:
+      - echo "Build completed successfully!"
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: "."
