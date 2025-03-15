@@ -1,23 +1,31 @@
-# Base image
-FROM python:3.11
+# Stage 1: Build stage
+FROM python:3.11-slim as builder
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the requirements file
+# Copy only requirements first for caching efficiency
 COPY requirements.txt .
 
-# Install the project dependencies
-RUN pip install -r requirements.txt
+# Create a virtual environment and install dependencies
+RUN python -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code into the container
+# Stage 2: Runtime stage
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy the virtual environment from the build stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Copy application code
 COPY . .
 
-# Expose the port the Flask application will be listening on
+# Expose the port Flask runs on
 EXPOSE 5000
 
-# Set environment variables, if necessary
-# ENV MY_ENV_VAR=value
-
-# Run the Flask application
+# Run the Flask app
 CMD ["python", "app.py"]
