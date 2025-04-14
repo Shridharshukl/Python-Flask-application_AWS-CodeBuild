@@ -27,4 +27,4 @@ docker run --name demoapp -p 8000:8000 -d shridhar71/simple-python-flask-app:lat
 
 echo "Success -> run"
 
-simple-python-flask-app
+
