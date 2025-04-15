@@ -1,6 +1,6 @@
 # Simple Python Flask App
 
-This project demonstrates how to create a simple Python Flask application and deploy it using Docker and AWS CodeBuild.
+This project demonstrates how to create a Portfolio Python Flask application and deploy it using Docker and AWS CodeBuild and AWS CodeDeploy.
 
 ## Setup
 
@@ -9,13 +9,14 @@ This project demonstrates how to create a simple Python Flask application and de
 - Docker
 - AWS CLI
 - AWS CodeBuild
+- AWS Codedeploy
 
 ### Clone the Repository
 
 1. Clone the repository:
     ```sh
     git clone <repository-url>
-    cd aws_flask_app/simple-python-app
+    cd Python-Flask-application_AWS-CodeBuild/simple-python-app
     ```
 
 ### Build and Run the Docker Container
