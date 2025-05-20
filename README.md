@@ -1,108 +1,142 @@
-# Simple Python Flask App
+# 🚀 Simple Python Flask App with CI/CD on AWS
 
-This project demonstrates how to create a Portfolio Python Flask application and deploy it using Docker and AWS CodeBuild and AWS CodeDeploy.
+This repository demonstrates how to build, containerize, and deploy a simple Python Flask application using **Docker**, **AWS CodeBuild**, and **AWS CodeDeploy**, all managed through an automated CI/CD pipeline. This setup follows modern DevOps practices and uses **AWS Systems Manager Parameter Store** to securely manage secrets.
 
-## Setup
+---
 
-### Prerequisites
+## 📦 Project Structure
 
-- Docker
-- AWS CLI
-- AWS CodeBuild
-- AWS Codedeploy
+```
+.
+├── appspec.yml               # Deployment configuration for CodeDeploy
+├── buildspec.yml             # Build instructions for CodeBuild
+├── Dockerfile                # Docker build file for Flask app
+├── start_container.sh        # Script to start container
+├── stop_container.sh         # Script to stop container
+├── simple-python-app/        # Source code for Flask app
+└── README.md                 # Project documentation
+```
 
-### Clone the Repository
+---
 
-1. Clone the repository:
-    ```sh
-    git clone <repository-url>
-    cd Python-Flask-application_AWS-CodeBuild/simple-python-app
-    ```
+## 🧰 Prerequisites
 
-### Build and Run the Docker Container
+* Docker installed locally
+* AWS CLI configured
+* AWS CodeBuild project
+* AWS CodeDeploy application and deployment group
+* IAM roles with permissions for CodeBuild and CodeDeploy
 
-1. Build the Docker image:
-    ```sh
-    docker build -t simple-python-flask-app .
-    ```
+---
 
-2. Run the Docker container:
-    ```sh
-    docker run -p 5000:5000 simple-python-flask-app
-    ```
+## 🚀 Clone the Repository
 
-3. Access the application:
-    Open your web browser and go to `http://localhost:5000`
+```sh
+git clone <repository-url>
+cd Python-Flask-application_AWS-CodeBuild/simple-python-app
+```
 
-## AWS CodeBuild
+---
 
-This project uses AWS CodeBuild for continuous integration and deployment.
+## 🐳 Build and Run Locally with Docker
 
-### Build Specification
+1. **Build the Docker image:**
 
-The build specification is defined in the `buildspec.yml` file.
+   ```sh
+   docker build -t simple-python-flask-app .
+   ```
 
-### Environment Variables
+2. **Run the Docker container:**
 
-The following environment variables are used in the build process:
+   ```sh
+   docker run -p 5000:5000 simple-python-flask-app
+   ```
 
-- `DOCKER_USER`: Docker Hub username (stored in AWS Parameter Store)
-- `DOCKER_PASS`: Docker Hub password (stored in AWS Parameter Store)
-- `DOCKER_URL`: Docker registry URL (static variable)
+3. **Access the application:**
 
-### Build Phases
+   * Open your browser at: `http://localhost:5000`
 
-1. **Install**: Install dependencies.
-2. **Pre-build**: Log in to Docker Hub.
-3. **Build**: Build and push the Docker image.
-4. **Post-build**: Finalize the build process.
+---
 
-### Artifacts
+## ⚙️ AWS CodeBuild Configuration
 
-The build artifacts are stored in the `../simple-python-app` directory.
+CodeBuild is used to automate the process of building and pushing the Docker image.
 
-## Deployment
+### 🔐 Environment Variables
 
-### AppSpec File
+Stored securely using **AWS Parameter Store** (SecureString):
 
-The deployment configuration is defined in the `appspec.yml` file.
+* `DOCKER_USER`: Docker Hub username
+* `DOCKER_PASS`: Docker Hub password
 
-### Hooks
+Static:
 
-The following hooks are defined in the `appspec.yml` file:
+* `DOCKER_URL`: Docker registry URL
 
-- **ApplicationStop**: Stops the running container (if any) using `stop_container.sh`.
-- **AfterInstall**: Starts the container using `start_container.sh`.
+### 🧱 Build Phases in `buildspec.yml`
 
-## Scripts
+1. **Install:** Install dependencies.
+2. **Pre-build:** Authenticate with Docker Hub.
+3. **Build:** Build and tag the Docker image.
+4. **Post-build:** Push the image to Docker Hub.
 
-### stop_container.sh
+### 🧾 Artifacts
 
-This script stops the running Docker container.
+Build artifacts are stored and deployed from the `../simple-python-app` directory.
+
+---
+
+## 🚀 Deployment with AWS CodeDeploy
+
+Uses `appspec.yml` to manage the deployment lifecycle.
+
+### 🪝 Lifecycle Hooks
+
+* **ApplicationStop**: Stops the running container with `stop_container.sh`
+* **AfterInstall**: Pulls and starts the latest Docker image with `start_container.sh`
+
+### 🔧 Scripts
+
+#### `stop_container.sh`
 
 ```bash
 #!/bin/bash
 set -e
-
-# Stop the running container (if any)
 echo "Stopping the running container..."
 docker stop simple-python-flask-app || true
 docker rm simple-python-flask-app || true
 ```
 
-### start_container.sh
-
-This script pulls the Docker image from Docker Hub and runs it as a container.
+#### `start_container.sh`
 
 ```bash
 #!/bin/bash
 set -e
-
-# Pull the Docker image from Docker Hub
 echo "Pulling the Docker image..."
 docker pull $DOCKER_USER/simple-python-flask-app:latest
 
-# Run the Docker image as a container
 echo "Running the Docker container..."
 docker run -d -p 5000:5000 --name simple-python-flask-app $DOCKER_USER/simple-python-flask-app:latest
 ```
+
+---
+
+## 🛡️ Security & Optimization
+
+* Secrets like Docker credentials are stored securely using **AWS Systems Manager Parameter Store (SecureString)**.
+* Follows AWS best practices for security and cost optimization.
+
+---
+
+## ✅ Summary
+
+This project is a complete demonstration of how to:
+
+* Build a Flask app
+* Containerize with Docker
+* Set up CI/CD with AWS CodeBuild and CodeDeploy
+* Secure credentials using AWS Parameter Store
+* Automate deployment with lifecycle hooks
+
+---
+
